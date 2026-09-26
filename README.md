@@ -8,7 +8,7 @@ The project includes pretrained model weights, training and evaluation pipelines
 
 ## Results
 
-Evaluation on a 49-image test set at a probability threshold of 0.5 produced the following results:
+Evaluation on a 200+ image test set at a probability threshold of 0.5 produced the following results:
 
 | Metric | Result |
 | --- | ---: |
