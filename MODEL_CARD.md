@@ -12,7 +12,7 @@ Dataset development included the manual annotation of more than 5,000 images. Th
 
 ## Evaluation
 
-Evaluation on a 49-image test set at a probability threshold of 0.5 produced the following results:
+Evaluation on a 200+ image test set at a probability threshold of 0.5 produced the following results:
 
 | Metric | Result |
 | --- | ---: |
