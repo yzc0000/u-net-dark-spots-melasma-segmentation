@@ -1,14 +1,14 @@
 # U-Net Segmentation for Dark Spots and Melasma
 
-A PyTorch implementation of binary semantic segmentation for visible dark spots and melasma-like pigmentation in facial images. The repository contains the U-Net architecture, a selected trained checkpoint, inference and evaluation commands, a reproducible training baseline, and an optional FastAPI interface.
+A PyTorch U-Net for binary semantic segmentation of visible dark spots and melasma-like pigmentation in facial images.
 
-As part of the broader dataset-development process for this work, I manually annotated more than 5,000 images. The images and annotations are not distributed in this repository because they require separate privacy and licensing review.
+The project includes pretrained model weights, training and evaluation pipelines, batch inference, qualitative analysis tools, and an optional FastAPI service. Dataset preparation included the manual annotation of more than 5,000 images.
 
-> **Research disclaimer:** This is a computer-vision portfolio project, not a medical device or diagnostic tool. See [MODEL_CARD.md](MODEL_CARD.md) for intended use and limitations.
+> **Research disclaimer:** This model is intended for computer-vision research and education. It is not a medical device or diagnostic tool. See [MODEL_CARD.md](MODEL_CARD.md) for intended use and limitations.
 
 ## Results
 
-The selected checkpoint was evaluated at a probability threshold of 0.5 on a held-out split of 49 image-mask pairs.
+Evaluation on a 49-image test set at a probability threshold of 0.5 produced the following results:
 
 | Metric | Result |
 | --- | ---: |
@@ -18,35 +18,36 @@ The selected checkpoint was evaluated at a probability threshold of 0.5 on a hel
 | Recall | 0.7525 |
 | F1 | 0.7571 |
 
-These are internal test-set results rather than an independent clinical benchmark. The 49-image evaluation split is separate from the broader annotation effort described above. The training images are intentionally excluded pending privacy and licensing review.
+These results measure segmentation performance on the project test set and do not represent clinical validation. The annotated training data are not distributed with the repository.
 
 ## Qualitative examples
 
-### Strong prediction
+### Segmentation example
 
-This held-out example combines clear image quality with close agreement between the manual mask and the model prediction (IoU 0.7468, Dice 0.8551).
+IoU `0.7468` · Dice `0.8551`
 
-![Strong segmentation example showing the original image, ground truth, prediction, and prediction overlay](docs/images/good-example.png)
+![Original image, ground-truth mask, predicted mask, and prediction overlay](docs/images/good-example.png)
 
-### Failure case
+### Challenging example
 
-This held-out example shows a difficult fragmented pigmentation pattern. The model over-segments several regions and misses parts of the manual annotation (IoU 0.2717, Dice 0.4273), illustrating the limitations of the current checkpoint on fine, disconnected boundaries.
+IoU `0.2717` · Dice `0.4273`
 
-![Segmentation failure case showing the original image, ground truth, prediction, and prediction overlay](docs/images/failure-example.png)
+The prediction over-segments fragmented regions and misses portions of the manual annotation.
 
-Both examples were selected from the test split using per-image IoU. They are included for transparent qualitative analysis rather than as evidence of clinical performance.
+![Original image, ground-truth mask, predicted mask, and prediction overlay for a challenging case](docs/images/failure-example.png)
 
-<sub>Image source: [dark spots — v1_clean_640_dark_spots](https://universe.roboflow.com/aaa-smeo4/dark-spots-g2nd1-mdfgv-tgt7p), published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Modified here by adding predictions, masks, overlays, labels, and metrics.</sub>
+<sub>Example images: [dark spots — v1_clean_640_dark_spots](https://universe.roboflow.com/aaa-smeo4/dark-spots-g2nd1-mdfgv-tgt7p), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Prediction grids and metrics added for this project.</sub>
 
 ## Architecture
 
-The network follows the encoder-decoder U-Net pattern:
+The network follows the encoder-decoder U-Net design:
 
-- four downsampling stages with double convolution blocks;
+- four downsampling stages with double-convolution blocks;
 - four skip-connected upsampling stages;
 - bilinear upsampling;
-- a single output channel for binary segmentation;
-- 640 × 640 RGB input and 64 base channels in the released checkpoint.
+- one output channel for binary segmentation;
+- 640 × 640 RGB input;
+- 64 base channels.
 
 ## Repository contents
 
@@ -54,14 +55,14 @@ The network follows the encoder-decoder U-Net pattern:
 | --- | --- |
 | `unet_model.py` | U-Net architecture |
 | `checkpoint.py` | Safe tensor-only checkpoint loading |
-| `predict.py` | Image or directory inference with masks and overlays |
+| `predict.py` | Image and directory inference with masks and overlays |
 | `dataset.py` | Paired image-mask dataset loader |
-| `train.py` | Reproducible BCE + Dice training baseline |
+| `train.py` | BCE + Dice training pipeline |
 | `evaluate.py` | Dice, IoU, precision, recall, and F1 evaluation |
-| `rank_examples.py` | Per-image IoU ranking for success and failure analysis |
+| `rank_examples.py` | Per-image IoU ranking for error analysis |
 | `make_example_grid.py` | Four-panel qualitative comparison generator |
 | `api.py` | Optional FastAPI prediction service |
-| `weights/u-net-dark-spots-melasma.pt` | Selected inference checkpoint |
+| `weights/u-net-dark-spots-melasma.pt` | Pretrained inference checkpoint |
 
 ## Installation
 
@@ -77,7 +78,7 @@ Activate the environment, then install the dependencies:
 pip install -r requirements.txt
 ```
 
-For a CUDA-specific PyTorch build, follow the command generated by the official PyTorch installer for your system.
+For a CUDA-specific PyTorch build, use the installation command provided by PyTorch for your operating system and CUDA version.
 
 ## Run inference
 
@@ -87,7 +88,7 @@ Process one image:
 python predict.py --input path/to/image.jpg
 ```
 
-Process all supported images inside a directory:
+Process all supported images in a directory:
 
 ```bash
 python predict.py --input path/to/images --output-dir outputs
@@ -97,7 +98,7 @@ Each input produces a binary mask and a red prediction overlay. Use `--threshold
 
 ## Dataset structure
 
-Training and evaluation expect PNG masks whose filenames match the image stems:
+Training and evaluation expect PNG masks with filenames matching their source image stems:
 
 ```text
 dataset/
@@ -111,7 +112,7 @@ dataset/
     └── test/
 ```
 
-Example: `images/train/subject_001.jpg` pairs with `masks/train/subject_001.png`.
+For example, `images/train/subject_001.jpg` pairs with `masks/train/subject_001.png`.
 
 ## Train
 
@@ -129,14 +130,14 @@ python evaluate.py --data path/to/dataset --split test
 
 ## Optional API
 
-Start the local service:
+Start the service locally:
 
 ```bash
 uvicorn api:app --host 127.0.0.1 --port 8000
 ```
 
-Then open `http://127.0.0.1:8000/docs` for the interactive API documentation. Uploaded images are processed in memory; the sample service does not persist them.
+Open `http://127.0.0.1:8000/docs` for interactive API documentation. Uploaded images are processed in memory and are not persisted by the service.
 
-## Checkpoint provenance
+## Pretrained weights
 
-The released artifact was derived from the selected local `0.68.pt` checkpoint. Its optimizer state was removed because it is unnecessary for inference, reducing the file from approximately 153 MB to 51 MB. The 110 model tensors were compared individually and are identical.
+The included checkpoint contains the trained U-Net parameters required for inference. Optimizer state is not included.
