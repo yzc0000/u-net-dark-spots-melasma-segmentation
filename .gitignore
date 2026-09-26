@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local data and generated artifacts
+data/
+datasets/
+runs/
+outputs/
+examples/private/
+*.zip
+*.tar
+*.tar.gz
+
+# Checkpoints are ignored unless explicitly selected for release.
+*.pt
+!weights/u-net-dark-spots-melasma.pt
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
