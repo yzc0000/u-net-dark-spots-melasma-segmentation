@@ -6,7 +6,7 @@ This repository contains a binary U-Net segmentation model that marks pixels ass
 
 The released checkpoint uses 64 base channels and bilinear upsampling. It was exported from epoch 45 of the selected training run. Optimizer state was removed from the public artifact; every released model tensor is identical to the selected local checkpoint.
 
-The broader dataset-development effort included more than 5,000 images annotated manually by the project author. Those source images and annotations are not included here because they require separate privacy and licensing review. This figure describes the overall annotation effort and should not be interpreted as the size of the selected checkpoint's held-out evaluation split.
+The broader dataset-development effort included more than 5,000 images annotated manually by the project author. Those source images and annotations are not included here because they require separate privacy.
 
 ## Intended use
 
