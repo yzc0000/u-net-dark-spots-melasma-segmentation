@@ -24,13 +24,13 @@ These are internal test-set results rather than an independent clinical benchmar
 
 ### Strong prediction
 
-This held-out example shows close agreement between the manual mask and the model prediction (IoU 0.9398, Dice 0.9690).
+This held-out example combines clear image quality with close agreement between the manual mask and the model prediction (IoU 0.7468, Dice 0.8551).
 
 ![Strong segmentation example showing the original image, ground truth, prediction, and prediction overlay](docs/images/good-example.png)
 
 ### Failure case
 
-This held-out example shows a difficult diffuse pigmentation pattern. The model detects only part of the annotated region (IoU 0.1218, Dice 0.2171), illustrating the limitations of the current checkpoint on fine, fragmented boundaries.
+This held-out example shows a difficult fragmented pigmentation pattern. The model over-segments several regions and misses parts of the manual annotation (IoU 0.2717, Dice 0.4273), illustrating the limitations of the current checkpoint on fine, disconnected boundaries.
 
 ![Segmentation failure case showing the original image, ground truth, prediction, and prediction overlay](docs/images/failure-example.png)
 
